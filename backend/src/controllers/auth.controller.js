@@ -6,16 +6,11 @@ import { ActivityLog } from '../models/ActivityLog.js';
 
 export async function signup(req, res) {
   const { error, value } = signupSchema.validate(req.body);
-  console.log("Value", value);
   if (error) return res.status(400).json({ message: error.message });
   const { name, email, password } = value;
-  console.log("Name", name);
-  console.log("Email", email);
-  console.log("Password", password);
   const existing = await User.findOne({ email });
   if (existing) return res.status(409).json({ message: 'Email already in use' });
   const passwordHash = await bcrypt.hash(password, 10);
-  console.log("PasswordHash", passwordHash);
   const user = await User.create({ name, email, passwordHash });
   const token = jwt.sign({}, process.env.JWT_SECRET, { subject: user.id, expiresIn: '1d' });
   await ActivityLog.create({ actor: user._id, action: 'user_signup', entityType: 'user', entityId: user._id });

@@ -1,11 +1,62 @@
-:root {
-  color-scheme: light dark;
-  --bg: #ffffff;
-  --fg: #111111;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b0f17;
+  --bg-elev: #0f1522;
+  --fg: #e6f1ff;
+  --muted: #7b8aa1;
+  --neon: #00e6ff;
+  --neon-2: #7a5cff;
+  --accent: #14f195;
+  --danger: #ff3b6b;
+  --card: #0c1220;
+  --glow: 0 0 20px rgba(0, 230, 255, 0.35), 0 0 40px rgba(122, 92, 255, 0.25);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f7f9fc;
+  --bg-elev: #ffffff;
+  --fg: #0f172a;
+  --muted: #475569;
+  --neon: #2d6cdf;
+  --neon-2: #7c3aed;
+  --accent: #0ea5e9;
+  --danger: #b91c1c;
+  --card: #ffffff;
+  --glow: 0 0 16px rgba(45,108,223,0.25), 0 0 24px rgba(124,58,237,0.18);
 }
 
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; padding: 0; }
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: var(--bg); color: var(--fg); }
-nav a { text-decoration: none; }
+body {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: radial-gradient(1200px 800px at 20% -10%, rgba(122,92,255,0.18), transparent 50%),
+              radial-gradient(900px 700px at 120% 10%, rgba(0,230,255,0.18), transparent 50%),
+              radial-gradient(800px 600px at -10% 120%, rgba(20,241,149,0.14), transparent 40%),
+              var(--bg);
+  color: var(--fg);
+}
+
+/* Neon cursor */
+.cursor-dot, .cursor-ring { position: fixed; pointer-events: none; z-index: 9999; mix-blend-mode: screen; }
+.cursor-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--neon); box-shadow: var(--glow); transform: translate(-50%, -50%); }
+.cursor-ring { width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(0,230,255,0.6); filter: drop-shadow(0 0 8px rgba(0,230,255,0.5)); transform: translate(-50%, -50%); transition: width .2s ease, height .2s ease, border-color .2s ease; }
+
+/* Page chrome */
+nav a { text-decoration: none; color: var(--fg); }
+
+/* Futuristic card utility for general usage */
+.neo-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.03) inset;
+}
+
+/* Soft scrollbars matching neon theme */
+* { scrollbar-width: thin; scrollbar-color: rgba(122,92,255,.5) transparent; }
+*::-webkit-scrollbar { height: 10px; width: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(122,92,255,.65), rgba(0,230,255,.65)); border-radius: 8px; }
 

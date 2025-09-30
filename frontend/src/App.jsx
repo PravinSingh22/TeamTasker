@@ -1,4 +1,4 @@
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from './features/auth/authSlice';
 import Login from './pages/Login';
@@ -24,7 +24,7 @@ export default function App() {
     <>
       <Header />
       <Routes>
-        <Route path="/" element={<div style={{ padding:16 }}>Welcome to TeamTasker</div>} />
+        <Route path="/" element={token ? <Navigate to="/projects" replace /> : <Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/projects" element={

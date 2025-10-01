@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchNotifications, markRead } from '../features/notifications/notificationsSlice';
+import { fetchNotifications, markRead, deleteNotification, clearAllNotifications } from '../features/notifications/notificationsSlice';
 
 export default function NotificationsPage() {
   const dispatch = useDispatch();
@@ -8,16 +8,28 @@ export default function NotificationsPage() {
   useEffect(() => { dispatch(fetchNotifications()); }, [dispatch]);
 
   return (
-    <div style={{ maxWidth: 720, margin: '24px auto' }}>
-      <h2>Notifications</h2>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+    <div style={{ maxWidth: 860, margin: '24px auto', padding: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <h2 style={{ margin: 0 }}>Notifications</h2>
+        {items.length > 0 && (
+          <button className="btn btn-danger" onClick={() => dispatch(clearAllNotifications())}>Clear All</button>
+        )}
+      </div>
+      <ul style={{ listStyle: 'none', padding: 0, display: 'grid', gap: 10 }}>
         {items.map((n) => (
-          <li key={n._id} style={{ border: '1px solid #eee', padding: 12, marginBottom: 8 }}>
-            <div>{n.type} - {n.data?.title || ''}</div>
-            <div style={{ fontSize: 12, color: '#666' }}>{n.read ? 'read' : 'unread'}</div>
-            {!n.read && <button onClick={() => dispatch(markRead(n._id))}>Mark read</button>}
+          <li key={n._id} className="neo-card" style={{ padding: 12, display: 'grid', gap: 6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontWeight: 700 }}>{n.data?.title || n.type}</div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {!n.read && <button className="btn btn-sm btn-ghost" onClick={() => dispatch(markRead(n._id))}>Mark read</button>}
+                <button className="btn btn-sm btn-danger" onClick={() => dispatch(deleteNotification(n._id))}>Delete</button>
+              </div>
+            </div>
+            {n.data?.message && <div style={{ fontSize: 13, opacity: .85 }}>{n.data.message}</div>}
+            <div style={{ fontSize: 12, opacity: .7 }}>{new Date(n.createdAt).toLocaleString()}</div>
           </li>
         ))}
+        {items.length === 0 && <div style={{ opacity: .7 }}>No notifications</div>}
       </ul>
     </div>
   );

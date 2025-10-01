@@ -1,52 +1,33 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProjects, createProject, updateProject, deleteProject } from '../features/projects/projectsSlice';
-import TasksPage from './Tasks';
+import { fetchUsers } from '../features/users/usersSlice';
 import { fetchTasks } from '../features/tasks/tasksSlice';
+import ProjectSidebar from '../components/ProjectSidebar';
+import TaskViews from '../components/TaskViews';
+import RightAnalyticsPanel from '../components/RightAnalyticsPanel';
 
 export default function ProjectsPage() {
   const dispatch = useDispatch();
-  const { items, loading, error } = useSelector((s) => s.projects || { items: [] });
-  const [form, setForm] = useState({ title: '', description: '' });
   const [selectedProject, setSelectedProject] = useState(null);
 
-  useEffect(() => { dispatch(fetchProjects()); }, [dispatch]);
+  useEffect(() => { dispatch(fetchUsers()); }, [dispatch]);
 
   return (
-    <div style={{ maxWidth: 720, margin: '24px auto' }}>
-      <h2>Projects</h2>
-      {error && <div style={{ color: 'crimson' }}>{error}</div>}
-
-      <form onSubmit={(e) => { e.preventDefault(); dispatch(createProject(form)); setForm({ title: '', description: '' }); }} style={{ marginBottom: 16 }}>
-        <input placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} style={{ marginRight: 8 }} />
-        <input placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} style={{ marginRight: 8, width: 300 }} />
-        <button disabled={loading} type="submit">Create</button>
-      </form>
-
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {items.map((p) => (
-          <li key={p._id} style={{ border: '1px solid #eee', padding: 12, marginBottom: 8 }}>
-            <div style={{ fontWeight: 600 }}>{p.title}</div>
-            <div style={{ fontSize: 13, color: '#666' }}>{p.description}</div>
-            <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
-              <button onClick={() => { setSelectedProject(p); dispatch(fetchTasks(p._id)); }}>Open</button>
-              <button onClick={() => {
-                const nt = prompt('New title', p.title);
-                const nd = prompt('New description', p.description || '');
-                if (nt !== null && nd !== null) dispatch(updateProject({ id: p._id, updates: { title: nt, description: nd } }));
-              }}>Edit</button>
-              <button onClick={() => dispatch(deleteProject(p._id))}>Delete</button>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {selectedProject && (
-        <div style={{ marginTop: 24 }}>
-          <h3>Tasks for: {selectedProject.title}</h3>
-          <TasksPage projectId={selectedProject._id} />
-        </div>
-      )}
+    <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr 360px', gap: 0 }}>
+      <ProjectSidebar selectedId={selectedProject?._id} onSelect={(p) => { setSelectedProject(p); dispatch(fetchTasks(p._id)); }} />
+      <main style={{ padding: 16 }}>
+        {selectedProject ? (
+          <div style={{ display: 'grid', gap: 12 }}>
+            <h2 style={{ marginTop: 0 }}>{selectedProject.title}</h2>
+            <TaskViews projectId={selectedProject._id} />
+          </div>
+        ) : (
+          <div style={{ height: 'calc(100vh - 60px)', display: 'grid', placeItems: 'center', color: 'var(--fg)' }}>
+            <div>Select a project to view tasks</div>
+          </div>
+        )}
+      </main>
+      <RightAnalyticsPanel />
     </div>
   );
 }

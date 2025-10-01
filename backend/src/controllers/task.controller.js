@@ -71,13 +71,20 @@ export async function deleteTask(req, res) {
 export async function addComment(req, res) {
   const { text } = req.body;
   if (!text) return res.status(400).json({ message: 'text is required' });
-  const task = await Task.findByIdAndUpdate(
-    req.params.id,
-    { $push: { comments: { author: req.user?.id, text } } },
-    { new: true }
-  );
+
+  const task = await Task.findById(req.params.id);
   if (!task) return res.status(404).json({ message: 'Not found' });
+
+  const comment = {
+    author: req.user?.id,
+    text,
+  };
+
+  task.comments.push(comment);
+  await task.save();
+
+  await task.populate('comments.author', 'id name email');
+
   await ActivityLog.create({ actor: req.user?.id, action: 'task_commented', entityType: 'task', entityId: task._id });
   return res.status(201).json(task);
 }
-

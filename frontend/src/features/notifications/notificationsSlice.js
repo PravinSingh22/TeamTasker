@@ -19,6 +19,24 @@ export const markRead = createAsyncThunk('notifications/markRead', async (id, { 
   }
 });
 
+export const deleteNotification = createAsyncThunk('notifications/delete', async (id, { rejectWithValue }) => {
+  try {
+    await api.delete(`/api/notifications/${id}`);
+    return id;
+  } catch (e) {
+    return rejectWithValue(e.response?.data || { message: 'Failed to delete notification' });
+  }
+});
+
+export const clearAllNotifications = createAsyncThunk('notifications/clearAll', async (_, { rejectWithValue }) => {
+  try {
+    await api.delete('/api/notifications');
+    return true;
+  } catch (e) {
+    return rejectWithValue(e.response?.data || { message: 'Failed to clear notifications' });
+  }
+});
+
 const notificationsSlice = createSlice({
   name: 'notifications',
   initialState: { items: [], loading: false, error: null },
@@ -31,6 +49,12 @@ const notificationsSlice = createSlice({
       .addCase(markRead.fulfilled, (s, a) => {
         const idx = s.items.findIndex((n) => n._id === a.payload._id);
         if (idx !== -1) s.items[idx] = a.payload;
+      })
+      .addCase(deleteNotification.fulfilled, (s, a) => {
+        s.items = s.items.filter((n) => n._id !== a.payload);
+      })
+      .addCase(clearAllNotifications.fulfilled, (s) => {
+        s.items = [];
       });
   }
 });
